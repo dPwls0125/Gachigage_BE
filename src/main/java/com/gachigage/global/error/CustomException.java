@@ -1,16 +1,19 @@
 package com.gachigage.global.error;
 
-import org.springframework.http.HttpStatus;
-
 import lombok.Getter;
 
 @Getter
 public class CustomException extends RuntimeException {
 
-	private final HttpStatus httpStatus;
+	private final ErrorCode errorCode;
 
-	public CustomException(HttpStatus httpStatus) {
-		super(httpStatus.getReasonPhrase());
-		this.httpStatus = httpStatus;
+	public CustomException(ErrorCode errorCode) {
+		super(errorCode.getMessage());
+		this.errorCode = errorCode;
+	}
+
+	public CustomException(ErrorCode errorCode, String detailMessage) {
+		super(detailMessage);
+		this.errorCode = errorCode;
 	}
 }
