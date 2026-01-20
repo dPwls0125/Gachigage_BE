@@ -7,8 +7,8 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 @Profile("prod")
 public class ObjectStorageImageUploader implements ImageUploader {
-    @Override
-    public String upload(MultipartFile file) {
-        return null; // Todo s3 이미지 업로드 구현
-    }
+	@Override
+	public String upload(MultipartFile file) {
+		return null; // Todo s3 이미지 업로드 구현
+	}
 }
