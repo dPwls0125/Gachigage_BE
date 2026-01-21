@@ -37,14 +37,10 @@ out/
 .vscode/
 
 ### Spring Boot ###
-**/application.yml
+application.yml
 application.properties
 application-*.yml
 application-*.properties
-src/test/resources/application.yml
-src/test/resources/application-*.yml
-src/test/resources/application.properties
-src/test/resources/application-*.properties
 !application-template.yml
 
 ### env ###
@@ -53,4 +49,7 @@ src/test/resources/application-*.properties
 
 ### docker files ###
 /mysql
+
+## Ai-CLI ##
+GEMINI.md
 
