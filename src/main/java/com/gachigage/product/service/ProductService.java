@@ -32,7 +32,7 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class ProductService {
-	
+
 	private final ProductCategoryRepository productCategoryRepository;
 	private final ProductRepository productRepository;
 	private final MemberRepository memberRepository;
@@ -41,7 +41,7 @@ public class ProductService {
 
 	@Transactional
 	public Product createProduct(
-		Long loginMemberId,
+		Long memberOauthId,
 		Long subCategoryId,
 		String title,
 		String detail,
@@ -53,8 +53,7 @@ public class ProductService {
 
 		ProductCategory category = productCategoryRepository.findById(subCategoryId)
 			.orElseThrow(() -> new CustomException(RESOURCE_NOT_FOUND, "존재하지 않는 카테고리입니다"));
-
-		Member seller = memberRepository.findById(loginMemberId)
+		Member seller = memberRepository.findMemberByOauthId(memberOauthId)
 			.orElseThrow(() -> new CustomException(USER_NOT_FOUND, "존재하지 않는 회원입니다"));
 
 		// Todo : 시도동으로 외부 API 연동 후 region 설정 _ 이미 존재하는 region인지 확인 필요
