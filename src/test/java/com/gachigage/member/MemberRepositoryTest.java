@@ -5,24 +5,21 @@ import static org.assertj.core.api.Assertions.*;
 import java.time.LocalDate;
 import java.util.Optional;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
+import jakarta.transaction.Transactional;
+
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@Transactional
 class MemberRepositoryTest {
 
 	@Autowired
 	MemberRepository memberRepository;
-
-	@BeforeEach
-	void beforeEach() {
-		memberRepository.deleteAll();
-	}
 
 	@Test
 	@DisplayName("Email로 멤버 찾기 성공 테스트")
