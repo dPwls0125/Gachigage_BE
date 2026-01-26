@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,7 +16,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.gachigage.global.ApiResponse;
-import com.gachigage.global.login.CustomOAuth2User;
 import com.gachigage.product.domain.Product;
 import com.gachigage.product.dto.CategoryResponseDto;
 import com.gachigage.product.dto.ProductDetailResponseDto;
@@ -26,6 +26,7 @@ import com.gachigage.product.service.ProductCategoryService;
 import com.gachigage.product.service.ProductService;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @Tag(name = "Product", description = "상품 관련 API")
@@ -47,12 +48,13 @@ public class ProductController {
 		@io.swagger.v3.oas.annotations.responses.ApiResponse(
 			responseCode = "200",
 			description = "상품이 성공적으로 등록되었습니다.")})
+	@SecurityRequirement(name = "bearerAuth")
 	@PostMapping
 	public ResponseEntity<ApiResponse<ProductRegistrationResponseDto>> registerProduct(
 		@RequestBody ProductRegistrationRequestDto requestDto,
-		@AuthenticationPrincipal CustomOAuth2User user) {
+		@AuthenticationPrincipal User user) {
 		Product product = productService.createProduct(
-			user.getMember().getId(),
+			Long.parseLong(user.getUsername()),
 			requestDto.getCategoryId(),
 			requestDto.getTitle(),
 			requestDto.getDetail(),
