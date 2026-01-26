@@ -2,6 +2,7 @@ package com.gachigage.product.dto;
 
 import java.util.List;
 
+import com.gachigage.product.domain.PriceTableStatus;
 import com.gachigage.product.domain.TradeType;
 
 import lombok.AllArgsConstructor;
@@ -30,6 +31,7 @@ public class ProductRegistrationRequestDto {
 	public static class ProductPriceRegistrationDto {
 		private Integer quantity;
 		private Integer price;
+		private PriceTableStatus status;
 	}
 
 	@Getter

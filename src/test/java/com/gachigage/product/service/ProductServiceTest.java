@@ -1,5 +1,6 @@
 package com.gachigage.product.service;
 
+import static com.gachigage.product.domain.PriceTableStatus.*;
 import static org.assertj.core.api.Assertions.*;
 
 import java.time.LocalDate;
@@ -16,13 +17,16 @@ import com.gachigage.global.WithMockCustomUser;
 import com.gachigage.member.Member;
 import com.gachigage.member.MemberRepository;
 import com.gachigage.member.RoleType;
-import com.gachigage.product.domain.PriceTableStatus;
 import com.gachigage.product.domain.Product;
 import com.gachigage.product.domain.ProductCategory;
+import com.gachigage.product.domain.ProductPrice;
+import com.gachigage.product.domain.Region;
 import com.gachigage.product.domain.TradeType;
+import com.gachigage.product.dto.ProductModifyRequestDto;
 import com.gachigage.product.dto.ProductRegistrationRequestDto;
 import com.gachigage.product.repository.ProductCategoryRepository;
 import com.gachigage.product.repository.ProductRepository;
+import com.gachigage.product.repository.RegionRepository;
 
 @SpringBootTest
 @Transactional
@@ -36,6 +40,8 @@ class ProductServiceTest {
 	private MemberRepository memberRepository;
 	@Autowired
 	private ProductCategoryRepository productCategoryRepository;
+	@Autowired
+	private RegionRepository regionRepository;
 
 	private Member savedMember;
 	private ProductCategory savedCategory;
@@ -52,18 +58,11 @@ class ProductServiceTest {
 			.build();
 		savedMember = memberRepository.save(member);
 
-		ProductCategory mainCategory = ProductCategory
-			.builder()
-			.name("가구")
-			.build();
+		ProductCategory mainCategory = ProductCategory.builder().name("가구").build();
 
 		productCategoryRepository.save(mainCategory);
 
-		ProductCategory subCategory = ProductCategory
-			.builder()
-			.name("의자")
-			.parent(mainCategory)
-			.build();
+		ProductCategory subCategory = ProductCategory.builder().name("의자").parent(mainCategory).build();
 
 		savedCategory = productCategoryRepository.save(subCategory);
 	}
@@ -79,12 +78,11 @@ class ProductServiceTest {
 		TradeType tradeType = TradeType.DELIVERY;
 
 		List<ProductRegistrationRequestDto.ProductPriceRegistrationDto> priceTable = List.of(
-			new ProductRegistrationRequestDto.ProductPriceRegistrationDto(1, 10000),
-			new ProductRegistrationRequestDto.ProductPriceRegistrationDto(5, 45000)
-		);
+			new ProductRegistrationRequestDto.ProductPriceRegistrationDto(1, 10000, ACTIVE),
+			new ProductRegistrationRequestDto.ProductPriceRegistrationDto(5, 45000, ACTIVE));
 
-		ProductRegistrationRequestDto.TradeLocationRegistrationDto tradeLocation =
-			new ProductRegistrationRequestDto.TradeLocationRegistrationDto(37.497952, 127.027619, "서울 강남구 강남역");
+		ProductRegistrationRequestDto.TradeLocationRegistrationDto tradeLocation = new ProductRegistrationRequestDto.TradeLocationRegistrationDto(
+			37.497952, 127.027619, "서울 강남구 강남역");
 
 		List<String> imageUrls = List.of("http://example.com/image1.jpg", "http://example.com/image2.jpg");
 
@@ -115,8 +113,8 @@ class ProductServiceTest {
 		assertThat(foundProduct.getLongtitude()).isEqualTo(tradeLocation.getLongitude());
 		assertThat(foundProduct.getAddress()).isEqualTo(tradeLocation.getAddress());
 
-		assertThat(foundProduct.getPrices().get(0).getStatus()).isEqualTo(PriceTableStatus.ACTIVE);
-		assertThat(foundProduct.getPrices().get(1).getStatus()).isEqualTo(PriceTableStatus.ACTIVE);
+		assertThat(foundProduct.getPrices().get(0).getStatus()).isEqualTo(ACTIVE);
+		assertThat(foundProduct.getPrices().get(1).getStatus()).isEqualTo(ACTIVE);
 
 		// ProductPrice와 ProductImage가 올바르게 저장되었는지 확인
 		assertThat(foundProduct.getPrices()).hasSize(2);
@@ -126,5 +124,66 @@ class ProductServiceTest {
 		assertThat(foundProduct.getRegion().getProvince()).isEqualTo("서울특별시"); // TODO : 외부 API 연동 후 수정
 		assertThat(foundProduct.getRegion().getCity()).isEqualTo("강남구"); // TODO : 외부 API 연동 후 수정
 		assertThat(foundProduct.getRegion().getDistrict()).isEqualTo("역삼동"); // TODO : 외부 API 연동 후 수정
+	}
+
+	@Test
+	@DisplayName("상품 수정 통합 테스트")
+	@WithMockCustomUser
+	void productModifySuccess() {
+
+		// given
+		// 1. 수정할 상품을 미리 저장
+		Region region = new Region("서울특별시", "강남구", "역삼동");
+		regionRepository.save(region);
+
+		Product product = Product.create(null, savedMember, savedCategory, region, "수정 전 제목", "수정 전 설명", 10L,
+			TradeType.DELIVERY, 37.123, 127.123, "수정 전 주소",
+			List.of(ProductPrice.builder().price(1000).quantity(10).status(ACTIVE).build()), List.of());
+
+		productRepository.save(product);
+
+		// 2. 수정할 정보
+		ProductCategory newCategory = ProductCategory.builder().name("책상").parent(savedCategory.getParent()).build();
+		productCategoryRepository.save(newCategory);
+
+		String modifiedTitle = "수정된 제목";
+		String modifiedDetail = "수정된 설명";
+		Long modifiedStock = 20L;
+		TradeType modifiedTradeType = TradeType.DIRECT;
+		List<ProductRegistrationRequestDto.ProductPriceRegistrationDto> modifiedPriceTable = List.of(
+			new ProductRegistrationRequestDto.ProductPriceRegistrationDto(1, 20000, INACTIVE),
+			new ProductRegistrationRequestDto.ProductPriceRegistrationDto(5, 90000, ACTIVE));
+		ProductModifyRequestDto.TradeLocationRegistrationDto modifiedTradeLocation = new ProductModifyRequestDto.TradeLocationRegistrationDto(
+			37.456, 127.456, "수정된 주소");
+		List<String> modifiedImageUrls = List.of("http://example.com/modified1.jpg",
+			"http://example.com/modified2.jpg");
+
+		// when
+		productService.modifyProduct(product.getId(), savedMember.getId(), newCategory.getId(), modifiedTitle,
+			modifiedDetail, modifiedStock, modifiedPriceTable, modifiedTradeType, modifiedTradeLocation,
+			modifiedImageUrls);
+
+		// then
+		Product foundProduct = productRepository.findById(product.getId()).get();
+
+		assertThat(foundProduct.getTitle()).isEqualTo(modifiedTitle);
+		assertThat(foundProduct.getDescription()).isEqualTo(modifiedDetail);
+		assertThat(foundProduct.getStock()).isEqualTo(modifiedStock);
+		assertThat(foundProduct.getTradeType()).isEqualTo(modifiedTradeType);
+		assertThat(foundProduct.getCategory().getId()).isEqualTo(newCategory.getId());
+		assertThat(foundProduct.getLatitude()).isEqualTo(modifiedTradeLocation.getLatitude());
+		assertThat(foundProduct.getLongtitude()).isEqualTo(modifiedTradeLocation.getLongitude());
+		assertThat(foundProduct.getAddress()).isEqualTo(modifiedTradeLocation.getAddress());
+
+		assertThat(foundProduct.getPrices()).hasSize(2);
+		assertThat(foundProduct.getPrices().get(0).getPrice()).isEqualTo(20000);
+		assertThat(foundProduct.getPrices().get(0).getQuantity()).isEqualTo(1);
+		assertThat(foundProduct.getPrices().get(0).getStatus()).isEqualTo(INACTIVE);
+		assertThat(foundProduct.getPrices().get(1).getPrice()).isEqualTo(90000);
+		assertThat(foundProduct.getPrices().get(1).getQuantity()).isEqualTo(5);
+		assertThat(foundProduct.getPrices().get(1).getStatus()).isEqualTo(ACTIVE);
+
+		assertThat(foundProduct.getImages()).hasSize(2);
+		assertThat(foundProduct.getImages().get(0).getImageUrl()).isEqualTo("http://example.com/modified1.jpg");
 	}
 }

@@ -9,6 +9,7 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -20,6 +21,7 @@ import com.gachigage.product.domain.Product;
 import com.gachigage.product.dto.CategoryResponseDto;
 import com.gachigage.product.dto.ProductDetailResponseDto;
 import com.gachigage.product.dto.ProductImageResponseDto;
+import com.gachigage.product.dto.ProductModifyRequestDto;
 import com.gachigage.product.dto.ProductRegistrationRequestDto;
 import com.gachigage.product.dto.ProductRegistrationResponseDto;
 import com.gachigage.product.service.ProductCategoryService;
@@ -66,6 +68,29 @@ public class ProductController {
 		);
 		return ResponseEntity.ok(
 			ApiResponse.success(ProductRegistrationResponseDto.builder().productId(product.getId()).build()));
+	}
+
+	@Operation(summary = "상품 수정", description = "판매자가 기존 상품의 정보를 수정합니다.")
+	@PutMapping("/{productId}")
+	@SecurityRequirement(name = "bearerAuth")
+	public ResponseEntity<ApiResponse<ProductModifyRequestDto>> modifyProduct(
+		@AuthenticationPrincipal User user,
+		@PathVariable Long productId,
+		@RequestBody ProductModifyRequestDto requestDto) {
+		productService.modifyProduct(
+			productId,
+			Long.parseLong(user.getUsername()),
+			requestDto.getCategoryId(),
+			requestDto.getTitle(),
+			requestDto.getDetail(),
+			requestDto.getStock(),
+			requestDto.getPriceTable(),
+			requestDto.getTradeType(),
+			requestDto.getPreferredTradeLocation(),
+			requestDto.getImageUrls()
+		);
+		return ResponseEntity.ok(ApiResponse.success());
+
 	}
 
 	@Operation(summary = "상품 상세 조회", description = "상품의 상세 정보 및 관련 상품을 조회합니다.")

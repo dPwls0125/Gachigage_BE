@@ -38,6 +38,16 @@ public class ProductDetailResponseDto {
 	private RelatedProductsDto relatedProducts;
 
 	public static ProductDetailResponseDto fromEntity(Product product, List<Product> relatedProducts) {
+
+		// TODO : 활성화된 가격 테이블만 필터링하는 로직 추가
+		// List<ProductPriceDto> productpriceDtos = product.getPrices().stream()
+		// 	.filter(price -> price.getStatus() == PriceTableStatus.ACTIVE)
+		// 	.map(price -> ProductPriceDto.builder()
+		// 		.quantity(price.getQuantity())
+		// 		.price(price.getPrice())
+		// 		.build())
+		// 	.toList();
+
 		return ProductDetailResponseDto.builder()
 			.productId(product.getId())
 			.title(product.getTitle())
