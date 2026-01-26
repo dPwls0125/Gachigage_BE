@@ -48,6 +48,7 @@ class ProductServiceTest {
 			.name("테스터")
 			.roleType(RoleType.USER)
 			.birthDate(LocalDate.now())
+			.oauthId(111L)
 			.build();
 		savedMember = memberRepository.save(member);
 
@@ -89,7 +90,7 @@ class ProductServiceTest {
 
 		// when
 		Product product = productService.createProduct(
-			savedMember.getId(),
+			savedMember.getOauthId(),
 			savedCategory.getId(),
 			title,
 			detail,

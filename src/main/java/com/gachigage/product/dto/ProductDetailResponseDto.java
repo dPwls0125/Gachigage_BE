@@ -2,6 +2,7 @@ package com.gachigage.product.dto;
 
 import java.util.List;
 
+import com.gachigage.product.domain.PriceTableStatus;
 import com.gachigage.product.domain.Product;
 import com.gachigage.product.domain.ProductImage;
 import com.gachigage.product.domain.ProductPrice;
@@ -55,6 +56,7 @@ public class ProductDetailResponseDto {
 				.map(price -> ProductPriceDto.builder()
 					.quantity(price.getQuantity())
 					.price(price.getPrice())
+					.status(price.getStatus())
 					.build())
 				.toList())
 			.preferredTradeLocations(
@@ -86,6 +88,7 @@ public class ProductDetailResponseDto {
 	public static class ProductPriceDto {
 		private Integer quantity;
 		private Integer price;
+		private PriceTableStatus status;
 	}
 
 	@Getter

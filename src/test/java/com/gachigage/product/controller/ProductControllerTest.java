@@ -28,6 +28,7 @@ import com.gachigage.global.config.SecurityConfig;
 import com.gachigage.global.login.service.CustomOAuth2UserService;
 import com.gachigage.member.Member;
 import com.gachigage.member.RoleType;
+import com.gachigage.product.domain.PriceTableStatus;
 import com.gachigage.product.domain.Product;
 import com.gachigage.product.domain.ProductPrice;
 import com.gachigage.product.domain.TradeType;
@@ -112,6 +113,7 @@ class ProductControllerTest {
 			List.of(ProductPrice.builder()
 				.quantity(1)
 				.price(10000)
+				.status(PriceTableStatus.ACTIVE)
 				.build()
 			),
 			List.of()
@@ -119,7 +121,7 @@ class ProductControllerTest {
 
 		given(productService.createProduct(
 			anyLong(),
-			any(),
+			anyLong(),
 			any(),
 			any(),
 			any(),

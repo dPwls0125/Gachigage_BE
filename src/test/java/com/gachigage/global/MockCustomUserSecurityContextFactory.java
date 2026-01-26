@@ -1,16 +1,15 @@
 package com.gachigage.global;
 
-import java.time.LocalDate;
-import java.util.HashMap;
+import java.util.Arrays;
+import java.util.Collection;
 
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.test.context.support.WithSecurityContextFactory;
-
-import com.gachigage.global.login.CustomOAuth2User;
-import com.gachigage.member.Member;
-import com.gachigage.member.RoleType;
 
 public class MockCustomUserSecurityContextFactory implements WithSecurityContextFactory<WithMockCustomUser> {
 
@@ -18,20 +17,15 @@ public class MockCustomUserSecurityContextFactory implements WithSecurityContext
 	public SecurityContext createSecurityContext(WithMockCustomUser annotation) {
 		SecurityContext context = SecurityContextHolder.createEmptyContext();
 
-		Member member = Member.builder()
-			.id(annotation.id())
-			.email(annotation.email())
-			.name(annotation.name())
-			.roleType(RoleType.valueOf(annotation.role()))
-			.birthDate(LocalDate.now())
-			.build();
+		Collection<? extends GrantedAuthority> authorities = Arrays.stream(annotation.role().split(","))
+			.map(SimpleGrantedAuthority::new)
+			.toList();
 
-		// Mock CustomOAuth2User 생성
-		CustomOAuth2User principal = new CustomOAuth2User(member, new HashMap<>());
+		User user = new User(String.valueOf(annotation.oauthId()), "", authorities);
 
 		// 인증 토큰 생성
-		UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(principal,
-			"fake-my-accessToken", principal.getAuthorities());
+		UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(user,
+			"fake-my-accessToken", authorities);
 
 		context.setAuthentication(authentication);
 

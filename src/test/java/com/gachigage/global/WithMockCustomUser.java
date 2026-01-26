@@ -15,4 +15,6 @@ public @interface WithMockCustomUser {
 	String role() default "USER";
 
 	String name() default "테스터";
+
+	long oauthId() default 111L;
 }
