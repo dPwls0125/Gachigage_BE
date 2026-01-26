@@ -1,6 +1,8 @@
 package com.gachigage.member.service;
 
 
+import com.gachigage.global.error.CustomException;
+import com.gachigage.global.error.ErrorCode;
 import com.gachigage.member.Member;
 import com.gachigage.member.MemberRepository;
 import com.gachigage.member.dto.response.MyProfileResponseDto;
@@ -19,7 +21,7 @@ public class MypageService {
     public MyProfileResponseDto getMyProfile(Long oauthId){
 
         Member member = memberRepository.findByOauthId(oauthId)
-                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         return MyProfileResponseDto.builder()
                 .userId(member.getId())
@@ -33,13 +35,10 @@ public class MypageService {
     public void updateNickname(Long oauthId, String newNickname) {
 
 
-        if (memberRepository.existsByNickname(newNickname)) {
-            throw new IllegalArgumentException("이미 사용 중인 닉네임입니다.");
-        }
 
 
         Member member = memberRepository.findByOauthId(oauthId)
-                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         member.updateNickname(newNickname);
     }

@@ -1,5 +1,7 @@
 package com.gachigage.member.service;
 
+import com.gachigage.global.error.CustomException;
+import com.gachigage.global.error.ErrorCode;
 import com.gachigage.member.Member;
 import com.gachigage.member.MemberRepository;
 import com.gachigage.member.dto.response.MyProfileResponseDto;
@@ -14,7 +16,6 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
@@ -52,11 +53,12 @@ class MypageServiceTest {
     void getMyProfile_Fail() {
 
         Long oauthId = 99999L;
-        given(memberRepository.findByOauthId(oauthId)).willReturn(Optional.empty()); // "없다"고 리턴
+        given(memberRepository.findByOauthId(oauthId)).willReturn(Optional.empty());
 
         assertThatThrownBy(() -> mypageService.getMyProfile(oauthId))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("사용자를 찾을 수 없습니다.");
+                .isInstanceOf(CustomException.class) //
+                .extracting("errorCode") //
+                .isEqualTo(ErrorCode.USER_NOT_FOUND); //
     }
 
     @Test
@@ -69,8 +71,7 @@ class MypageServiceTest {
                 .oauthId(oauthId)
                 .nickname("기존닉네임")
                 .build();
-
-        given(memberRepository.existsByNickname(newNickname)).willReturn(false);
+        
 
         given(memberRepository.findByOauthId(oauthId)).willReturn(Optional.of(mockMember));
 
@@ -79,17 +80,5 @@ class MypageServiceTest {
         assertThat(mockMember.getNickname()).isEqualTo(newNickname);
     }
 
-    @Test
-    @DisplayName("중복된 닉네임")
-    void updateNickname_Fail_Duplicate() {
 
-        Long oauthId = 12345L;
-        String duplicateNickname = "중복된놈";
-
-        given(memberRepository.existsByNickname(duplicateNickname)).willReturn(true);
-
-        assertThatThrownBy(() -> mypageService.updateNickname(oauthId, duplicateNickname))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("이미 사용 중인 닉네임입니다.");
-    }
 }
