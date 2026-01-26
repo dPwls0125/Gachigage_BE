@@ -23,6 +23,7 @@ import com.gachigage.global.WithMockCustomUser;
 import com.gachigage.member.Member;
 import com.gachigage.member.MemberRepository;
 import com.gachigage.member.RoleType;
+import com.gachigage.product.domain.PriceTableStatus;
 import com.gachigage.product.domain.Product;
 import com.gachigage.product.domain.ProductCategory;
 import com.gachigage.product.domain.ProductImage;
@@ -92,8 +93,9 @@ public class ProductIntegrationTest {
 		// 4. Product 생성 및 저장
 		testProduct = Product.create(null, // ID는 자동 생성
 			testMember, subCategory, testRegion, "테스트 상품 제목", "테스트 상품 상세 설명", 10L, TradeType.DIRECT, 37.123456,
-			127.654321, "서울 강남구 역삼동", List.of(ProductPrice.builder().quantity(1).price(10000).build(),
-				ProductPrice.builder().quantity(5).price(45000).build()),
+			127.654321, "서울 강남구 역삼동",
+			List.of(ProductPrice.builder().quantity(1).price(10000).status(PriceTableStatus.ACTIVE).build(),
+				ProductPrice.builder().quantity(5).price(45000).status(PriceTableStatus.ACTIVE).build()),
 			List.of(ProductImage.builder().imageUrl("http://localhost/image1.jpg").build(),
 				ProductImage.builder().imageUrl("http://localhost/image2.jpg").build()));
 		productRepository.save(testProduct);
@@ -128,8 +130,10 @@ public class ProductIntegrationTest {
 			.andExpect(jsonPath("$.data.stock").value(10L))
 			.andExpect(jsonPath("$.data.priceTable[0].quantity").value(1))
 			.andExpect(jsonPath("$.data.priceTable[0].price").value(10000))
+			.andExpect(jsonPath("$.data.priceTable[0].status").value(PriceTableStatus.ACTIVE.name()))
 			.andExpect(jsonPath("$.data.priceTable[1].quantity").value(5))
 			.andExpect(jsonPath("$.data.priceTable[1].price").value(45000))
+			.andExpect(jsonPath("$.data.priceTable[1].status").value(PriceTableStatus.ACTIVE.name()))
 			.andExpect(jsonPath("$.data.preferredTradeLocations[0].latitude").value(37.123456))
 			.andExpect(jsonPath("$.data.preferredTradeLocations[0].longitude").value(127.654321))
 			.andExpect(jsonPath("$.data.preferredTradeLocations[0].address").value("서울 강남구 역삼동"))
