@@ -2,6 +2,8 @@ package com.gachigage.member;
 
 import java.time.LocalDate;
 
+import com.gachigage.global.common.BaseEntity;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -9,6 +11,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 import lombok.AllArgsConstructor;
@@ -21,7 +24,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-public class Member {
+@Table(name = "member")
+public class Member extends BaseEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
@@ -32,7 +36,7 @@ public class Member {
 	@Column(nullable = false, length = 100, unique = true)
 	private String email;
 
-	@Column(length = 50, unique = true)
+	@Column(length = 50)
 	private String nickname;
 
 	@Column(name = "birth_date")
