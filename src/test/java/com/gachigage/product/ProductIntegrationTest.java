@@ -207,7 +207,7 @@ public class ProductIntegrationTest {
 		// when & then
 		mockMvc.perform(delete("/products/{productId}", productId))
 			.andDo(print())
-			.andExpect(status().is3xxRedirection());
+			.andExpect(status().isUnauthorized());
 
 	}
 
