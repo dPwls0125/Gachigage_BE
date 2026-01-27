@@ -30,7 +30,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-@Table(name = "Product")
+@Table(name = "product")
 public class Product extends BaseEntity {
 
 	@Id
@@ -135,6 +135,47 @@ public class Product extends BaseEntity {
 		prices.forEach(product::addPrice);
 		images.forEach(product::addImage);
 		return product;
+	}
+
+	public void modify(
+		ProductCategory category,
+		String title,
+		String description,
+		Long stock,
+		TradeType tradeType,
+		Double latitude,
+		Double longitude,
+		String address,
+		List<ProductPrice> newPrices,
+		List<ProductImage> newImages
+	) {
+		this.category = category;
+		this.title = title;
+		this.description = description;
+		this.stock = stock;
+		this.tradeType = tradeType;
+		this.latitude = latitude;
+		this.longtitude = longitude;
+		this.address = address;
+
+		changePrices(newPrices);
+		changeImages(newImages);
+	}
+
+	private void changePrices(List<ProductPrice> newPrices) {
+		this.prices.clear(); // orphanRemoval → DELETE
+
+		for (ProductPrice price : newPrices) {
+			addPrice(price); // validation + 연관관계 세팅
+		}
+	}
+
+	private void changeImages(List<ProductImage> newImages) {
+		this.images.clear();
+
+		for (ProductImage image : newImages) {
+			addImage(image);
+		}
 	}
 
 	public void increaseVisitCount() {

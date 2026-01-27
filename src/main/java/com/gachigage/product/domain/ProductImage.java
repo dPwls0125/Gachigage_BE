@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-@Table(name = "ProductImage")
+@Table(name = "product_image")
 public class ProductImage {
 
 	@Id

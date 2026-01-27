@@ -9,14 +9,18 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class ProductModifyRequestDto {
-	private ProductModifyRequestDto.ProductCategoryRegistrationDto productCategory;
+	private Long categoryId;
 	private String title;
 	private String detail;
 	private Long stock;
 	private List<ProductRegistrationRequestDto.ProductPriceRegistrationDto> priceTable;
 	private TradeType tradeType;
-	private ProductModifyRequestDto.TradeLocationRegistrationDto preferredTradeLocations;
+	private ProductModifyRequestDto.TradeLocationRegistrationDto preferredTradeLocation;
 	private List<String> imageUrls;
 
 	@Getter

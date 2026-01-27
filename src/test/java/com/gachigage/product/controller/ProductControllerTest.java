@@ -81,8 +81,8 @@ class ProductControllerTest {
 	void registerProductSuccess() throws Exception {
 		// given
 		List<ProductRegistrationRequestDto.ProductPriceRegistrationDto> priceTable = List.of(
-			new ProductRegistrationRequestDto.ProductPriceRegistrationDto(1, 10000),
-			new ProductRegistrationRequestDto.ProductPriceRegistrationDto(5, 45000)
+			new ProductRegistrationRequestDto.ProductPriceRegistrationDto(1, 10000, PriceTableStatus.ACTIVE),
+			new ProductRegistrationRequestDto.ProductPriceRegistrationDto(5, 45000, PriceTableStatus.ACTIVE)
 		);
 		ProductRegistrationRequestDto.TradeLocationRegistrationDto tradeLocation =
 			new ProductRegistrationRequestDto.TradeLocationRegistrationDto(37.497952, 127.027619, "서울 강남구 강남역");

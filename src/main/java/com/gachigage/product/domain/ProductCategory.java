@@ -21,7 +21,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-@Table(name = "ProductCategory")
+@Table(name = "product_category")
 public class ProductCategory {
 
 	@Id

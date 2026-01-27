@@ -22,6 +22,7 @@ import com.gachigage.product.domain.ProductPrice;
 import com.gachigage.product.domain.Region;
 import com.gachigage.product.domain.TradeType;
 import com.gachigage.product.dto.ProductDetailResponseDto;
+import com.gachigage.product.dto.ProductModifyRequestDto;
 import com.gachigage.product.dto.ProductRegistrationRequestDto;
 import com.gachigage.product.repository.ProductCategoryRepository;
 import com.gachigage.product.repository.ProductRepository;
@@ -38,6 +39,61 @@ public class ProductService {
 	private final MemberRepository memberRepository;
 	private final RegionRepository regionRepository;
 	private final ImageService imageService;
+
+	@Transactional
+	public Product modifyProduct(
+		Long productId,
+		Long loginMemberId,
+		Long subCategoryId,
+		String title,
+		String detail,
+		Long stock,
+		List<ProductRegistrationRequestDto.ProductPriceRegistrationDto> priceTableDtos,
+		TradeType tradeType,
+		ProductModifyRequestDto.TradeLocationRegistrationDto preferredTradeLocationDto,
+		List<String> imageUrls
+	) {
+
+		Product product = productRepository.findById(productId)
+			.orElseThrow(() -> new CustomException(RESOURCE_NOT_FOUND, "존재하지 않는 상품입니다"));
+
+		Member member = memberRepository.findById(loginMemberId)
+			.orElseThrow(() -> new CustomException(USER_NOT_FOUND, "존재하지 않는 회원입니다"));
+
+		if (!product.getSeller().getId().equals(member.getId())) {
+			throw new CustomException(UNAUTHORIZED_USER, "상품 수정 권한이 없는 사용자입니다.");
+		}
+
+		ProductCategory newCategory = productCategoryRepository.findById(subCategoryId)
+			.orElseThrow(() -> new CustomException(RESOURCE_NOT_FOUND, "존재하지 않는 카테고리입니다"));
+
+		List<ProductPrice> newPrices = priceTableDtos.stream()
+			.map(priceDto -> ProductPrice.builder()
+				.quantity(priceDto.getQuantity())
+				.price(priceDto.getPrice())
+				.status(priceDto.getStatus())
+				.build()).toList();
+
+		List<ProductImage> newProductImages = imageUrls.stream()
+			.map(url -> ProductImage.builder()
+				.imageUrl(url)
+				.build()).toList();
+
+		product.modify(
+			newCategory,
+			title,
+			detail,
+			stock,
+			tradeType,
+			preferredTradeLocationDto.getLatitude(),
+			preferredTradeLocationDto.getLongitude(),
+			preferredTradeLocationDto.getAddress(),
+			newPrices,
+			newProductImages
+		);
+
+		return product;
+	}
 
 	@Transactional
 	public Product createProduct(
@@ -114,6 +170,20 @@ public class ProductService {
 
 	public List<String> saveToBucketAndGetImageUrls(List<MultipartFile> files) {
 		return imageService.uploadImage(files);
+	}
+
+	@Transactional
+	public void deleteProduct(Long productId, Long loginMemberId) {
+		Product product = productRepository.findById(productId)
+			.orElseThrow(() -> new CustomException(RESOURCE_NOT_FOUND, "존재하지 않는 상품입니다"));
+
+		Member member = memberRepository.findMemberByOauthId(loginMemberId)
+			.orElseThrow(() -> new CustomException(USER_NOT_FOUND, "존재하지 않는 회원입니다"));
+
+		if (!product.getSeller().getOauthId().equals(member.getOauthId())) {
+			throw new CustomException(UNAUTHORIZED_USER, "상품 삭제 권한이 없는 사용자입니다.");
+		}
+		productRepository.delete(product);
 	}
 
 	private List<Product> searchRelatedProducts(
