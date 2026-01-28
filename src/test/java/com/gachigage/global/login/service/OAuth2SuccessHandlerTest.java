@@ -17,7 +17,6 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import com.gachigage.global.config.JwtProvider;
 import com.gachigage.global.login.CustomOAuth2User;
-import com.gachigage.member.Member;
 import com.gachigage.member.RoleType;
 
 import jakarta.servlet.ServletException;

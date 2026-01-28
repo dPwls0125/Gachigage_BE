@@ -1,7 +1,5 @@
 package com.gachigage.product.domain;
 
-import com.gachigage.member.Member;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;

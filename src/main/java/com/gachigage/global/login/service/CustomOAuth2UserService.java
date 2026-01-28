@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 import com.gachigage.global.error.CustomException;
 import com.gachigage.global.error.ErrorCode;
 import com.gachigage.global.login.CustomOAuth2User;
-import com.gachigage.member.Member;
 import com.gachigage.member.MemberRepository;
 import com.gachigage.member.RoleType;
 
