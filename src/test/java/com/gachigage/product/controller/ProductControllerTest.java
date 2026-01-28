@@ -23,6 +23,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gachigage.global.WithMockCustomUser;
+import com.gachigage.global.config.CustomAuthenticationEntryPoint;
 import com.gachigage.global.config.JwtProvider;
 import com.gachigage.global.config.SecurityConfig;
 import com.gachigage.global.login.service.CustomOAuth2UserService;
@@ -61,6 +62,9 @@ class ProductControllerTest {
 
 	@MockitoBean
 	private CustomOAuth2UserService oAuth2UserService;
+
+	@MockitoBean
+	private CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
 
 	private Member member;
 

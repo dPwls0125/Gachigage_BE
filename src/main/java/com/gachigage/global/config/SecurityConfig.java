@@ -24,7 +24,8 @@ public class SecurityConfig {
 	private final JwtProvider jwtProvider;
 
 	@Bean
-	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+	public SecurityFilterChain securityFilterChain(HttpSecurity http,
+		CustomAuthenticationEntryPoint customAuthenticationEntryPoint) throws Exception {
 		http.csrf(AbstractHttpConfigurer::disable)
 			.formLogin(AbstractHttpConfigurer::disable)
 			.httpBasic(AbstractHttpConfigurer::disable)
@@ -38,6 +39,7 @@ public class SecurityConfig {
 				).permitAll()
 				.requestMatchers(HttpMethod.GET, "/products/**").permitAll()
 				.anyRequest().authenticated())
+			.exceptionHandling(handler -> handler.authenticationEntryPoint(customAuthenticationEntryPoint))
 			.oauth2Login(oauth2 -> oauth2
 				.userInfoEndpoint(userInfo -> userInfo
 					.userService(oAuth2UserService))
