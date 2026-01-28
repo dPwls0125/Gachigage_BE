@@ -182,6 +182,16 @@ public class Product extends BaseEntity {
 		this.visitCount += 1;
 	}
 
+	public void incrementLikeCount() {
+		this.likeCount += 1;
+	}
+
+	public void decrementLikeCount() {
+		if (this.likeCount > 0) {
+			this.likeCount -= 1;
+		}
+	}
+
 	private void addPrice(ProductPrice price) {
 
 		if (price == null) {

@@ -33,6 +33,7 @@ import com.gachigage.product.domain.Region;
 import com.gachigage.product.domain.TradeType;
 import com.gachigage.product.repository.ProductCategoryRepository;
 import com.gachigage.product.repository.ProductImageRepository;
+import com.gachigage.product.repository.ProductLikeRepository;
 import com.gachigage.product.repository.ProductRepository;
 import com.gachigage.product.repository.RegionRepository;
 
@@ -60,6 +61,9 @@ public class ProductIntegrationTest {
 
 	@Autowired
 	private ProductImageRepository productImageRepository;
+
+	@Autowired
+	private ProductLikeRepository productLikeRepository;
 
 	private Member testMember;
 
@@ -107,6 +111,7 @@ public class ProductIntegrationTest {
 				ProductPrice.builder().quantity(5).price(45000).status(PriceTableStatus.ACTIVE).build()),
 			List.of(ProductImage.builder().imageUrl("http://localhost/image1.jpg").build(),
 				ProductImage.builder().imageUrl("http://localhost/image2.jpg").build()));
+
 		productRepository.save(testProduct);
 	}
 
@@ -212,6 +217,47 @@ public class ProductIntegrationTest {
 	}
 
 	@Test
+	@DisplayName("상품 좋아요 성공")
+	void likeProductSuccessIntegrationTest() throws Exception {
+
+		// given
+		Long productId = testProduct.getId();
+		String authenticatedUserId = testMember.getOauthId().toString();
+
+		// when & then
+		mockMvc.perform(post("/products/{productId}/like", productId)
+				.with(user(authenticatedUserId)))
+			.andDo(print())
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.status").value(200))
+			.andExpect(jsonPath("$.message").value("성공적으로 처리되었습니다."));
+
+	}
+
+	@Test
+	@DisplayName("상품 좋아요 취소")
+	void unlikeProductSuccessIntegrationTest() throws Exception {
+
+		// given
+		Long productId = testProduct.getId();
+		String authenticatedUserId = testMember.getOauthId().toString();
+
+		// 먼저 좋아요를 누름
+		mockMvc.perform(post("/products/{productId}/like", productId)
+				.with(user(authenticatedUserId)))
+			.andExpect(status().isOk());
+
+		// when & then
+		mockMvc.perform(post("/products/{productId}/like", productId)
+				.with(user(authenticatedUserId)))
+			.andDo(print())
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.status").value(200))
+			.andExpect(jsonPath("$.message").value("성공적으로 처리되었습니다."));
+
+	}
+
+	@Test
 	@DisplayName("상품 삭제 통합 테스트 - 실패 (권한 없는 사용자)")
 	void deleteProductUnauthorizedIntegrationTest() throws Exception {
 
@@ -241,6 +287,7 @@ public class ProductIntegrationTest {
 
 	@AfterEach
 	void tearDown() {
+		productLikeRepository.deleteAll();
 		productRepository.deleteAll();
 		memberRepository.deleteAll();
 		productCategoryRepository.deleteAll();

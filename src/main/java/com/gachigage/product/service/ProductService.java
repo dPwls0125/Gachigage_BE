@@ -18,13 +18,16 @@ import com.gachigage.product.domain.PriceTableStatus;
 import com.gachigage.product.domain.Product;
 import com.gachigage.product.domain.ProductCategory;
 import com.gachigage.product.domain.ProductImage;
+import com.gachigage.product.domain.ProductLike;
 import com.gachigage.product.domain.ProductPrice;
 import com.gachigage.product.domain.Region;
 import com.gachigage.product.domain.TradeType;
 import com.gachigage.product.dto.ProductDetailResponseDto;
+import com.gachigage.product.dto.ProductLikeResponseDto;
 import com.gachigage.product.dto.ProductModifyRequestDto;
 import com.gachigage.product.dto.ProductRegistrationRequestDto;
 import com.gachigage.product.repository.ProductCategoryRepository;
+import com.gachigage.product.repository.ProductLikeRepository;
 import com.gachigage.product.repository.ProductRepository;
 import com.gachigage.product.repository.RegionRepository;
 
@@ -39,6 +42,32 @@ public class ProductService {
 	private final MemberRepository memberRepository;
 	private final RegionRepository regionRepository;
 	private final ImageService imageService;
+	private final ProductLikeRepository productLikeRepository;
+
+	@Transactional
+	public ProductLikeResponseDto toggleProductLike(Long loginMemberId, Long productId) {
+		Member member = memberRepository.findMemberByOauthId(loginMemberId)
+			.orElseThrow(() -> new CustomException(USER_NOT_FOUND, "존재하지 않는 회원입니다"));
+
+		Product product = productRepository.findById(productId)
+			.orElseThrow(() -> new CustomException(RESOURCE_NOT_FOUND, "존재하지 않는 상품입니다"));
+
+		return productLikeRepository.findByMemberAndProduct(member, product)
+			.map(productLike -> {
+				productLikeRepository.delete(productLike);
+				product.decrementLikeCount();
+				return new ProductLikeResponseDto(false, product.getLikeCount());
+			})
+			.orElseGet(() -> {
+				ProductLike productLike = ProductLike.builder()
+					.member(member)
+					.product(product)
+					.build();
+				productLikeRepository.save(productLike);
+				product.incrementLikeCount();
+				return new ProductLikeResponseDto(true, product.getLikeCount());
+			});
+	}
 
 	@Transactional
 	public Product modifyProduct(

@@ -22,6 +22,7 @@ import com.gachigage.product.domain.Product;
 import com.gachigage.product.dto.CategoryResponseDto;
 import com.gachigage.product.dto.ProductDetailResponseDto;
 import com.gachigage.product.dto.ProductImageResponseDto;
+import com.gachigage.product.dto.ProductLikeResponseDto;
 import com.gachigage.product.dto.ProductModifyRequestDto;
 import com.gachigage.product.dto.ProductRegistrationRequestDto;
 import com.gachigage.product.dto.ProductRegistrationResponseDto;
@@ -122,6 +123,21 @@ public class ProductController {
 		@RequestPart("files") List<MultipartFile> imageFiles) {
 		List<String> urls = productService.saveToBucketAndGetImageUrls(imageFiles);
 		return ResponseEntity.ok(ApiResponse.success(new ProductImageResponseDto(urls)));
+	}
+
+	@Operation(summary = "상품 좋아요/취소", description = "로그인한 유저가 상품에 좋아요를 누르거나 취소합니다.")
+	@io.swagger.v3.oas.annotations.responses.ApiResponses({
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(
+			responseCode = "200",
+			description = "상품 좋아요/취소 성공")})
+	@SecurityRequirement(name = "bearerAuth")
+	@PostMapping("/{productId}/like")
+	public ResponseEntity<ApiResponse<ProductLikeResponseDto>> toggleProductLike(
+		@AuthenticationPrincipal User user,
+		@PathVariable Long productId
+	) {
+		ProductLikeResponseDto result = productService.toggleProductLike(Long.parseLong(user.getUsername()), productId);
+		return ResponseEntity.ok(ApiResponse.success(result));
 	}
 
 	@Operation(summary = "카테고리 조회", description = "상품 카테고리 목록을 조회합니다.")
