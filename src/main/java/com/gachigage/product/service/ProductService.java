@@ -69,7 +69,7 @@ public class ProductService {
 	}
 
 	@Transactional
-	public Product modifyProduct(Long productId, Long loginMemberId, Long subCategoryId, String title, String detail,
+	public void modifyProduct(Long productId, Long loginMemberId, Long subCategoryId, String title, String detail,
 		Long stock, List<ProductRegistrationRequestDto.ProductPriceRegistrationDto> priceTableDtos, TradeType tradeType,
 		ProductModifyRequestDto.TradeLocationRegistrationDto preferredTradeLocationDto, List<String> imageUrls) {
 
@@ -101,8 +101,6 @@ public class ProductService {
 		product.modify(newCategory, title, detail, stock, tradeType, preferredTradeLocationDto.getLatitude(),
 			preferredTradeLocationDto.getLongitude(), preferredTradeLocationDto.getAddress(), newPrices,
 			newProductImages);
-
-		return product;
 	}
 
 	@Transactional
