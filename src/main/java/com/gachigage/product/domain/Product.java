@@ -281,4 +281,11 @@ public class Product extends BaseEntity {
 		this.images.add(image);
 		image.setProduct(this);
 	}
+
+	public void deduceStock(Long quantity) {
+		if (this.stock < quantity) {
+			throw new CustomException(ErrorCode.INSUFFICIENT_STOCK, "재고가 부족합니다.");
+		}
+		this.stock -= quantity;
+	}
 }

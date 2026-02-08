@@ -21,7 +21,10 @@ public enum ErrorCode {
 	INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "C006", "서버 내부 오류가 발생했습니다."),
 
 	// 이미지 업로드 오류
-	IMAGE_UPLOAD_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "I001", "이미지 업로드에 실패했습니다.");
+	IMAGE_UPLOAD_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "I001", "이미지 업로드에 실패했습니다."),
+
+	// 제품 관룐 에러
+	INSUFFICIENT_STOCK(HttpStatus.BAD_REQUEST, "P001", "재고가 부족합니다.");
 
 	private final HttpStatus httpStatus;
 	private final String code;

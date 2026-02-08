@@ -3,6 +3,7 @@ package com.gachigage.trade.service;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.gachigage.chat.domain.ChatRoom;
 import com.gachigage.chat.repository.ChatRoomRepository;
@@ -26,6 +27,7 @@ public class TradeService {
 	private final ChatRoomRepository chatRoomRepository;
 	private final ProductPriceRepository productPriceRepository;
 
+	@Transactional
 	public Trade createTrade(Long chatRoomId, Long productPriceId) {
 		ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
 			.orElseThrow(() -> new CustomException(ErrorCode.INVALID_INPUT_VALUE, "존재하지 않는 채팅방입니다."));
@@ -34,6 +36,8 @@ public class TradeService {
 		ProductPrice productPrice = productPriceRepository
 			.findById(productPriceId)
 			.orElseThrow(() -> new CustomException(ErrorCode.INVALID_INPUT_VALUE, "존재하지 않는 상품 가격 정보입니다."));
+
+		tradeProduct.deduceStock((long)productPrice.getQuantity());
 
 		Trade trade = Trade.builder()
 			.seller(chatRoom.getSeller())
