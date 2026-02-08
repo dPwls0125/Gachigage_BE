@@ -108,8 +108,14 @@ public class ProductService {
 
 		validateAccessorEqualsSeller(product, member);
 
-		ProductCategory category = productCategoryRepository.findById(subCategoryId)
-			.orElseThrow(() -> new CustomException(RESOURCE_NOT_FOUND, "존재하지 않는 카테고리입니다"));
+		ProductCategory category;
+		if (subCategoryId == null) {
+			category = productCategoryRepository.findById(8L)
+				.orElseThrow(() -> new CustomException(RESOURCE_NOT_FOUND, "존재하지 않는 카테고리입니다"));
+		} else {
+			category = productCategoryRepository.findById(subCategoryId)
+				.orElseThrow(() -> new CustomException(RESOURCE_NOT_FOUND, "존재하지 않는 카테고리입니다"));
+		}
 
 		List<ProductPrice> prices = priceTableDtos.stream()
 			.map(dto -> ProductPrice.builder()
