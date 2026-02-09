@@ -39,14 +39,19 @@ out/
 ### Spring Boot ###
 application.yml
 application.properties
-
 application-*.yml
 application-*.properties
-
-src/test/resources/application.yml
-src/test/resources/application-*.yml
-
-src/test/resources/application.properties
-src/test/resources/application-*.properties
-
 !application-template.yml
+
+### env ###
+.env
+.env.local
+
+### docker files ###
+/mysql
+
+## Ai-CLI ##
+GEMINI.md
+
+### Local database ###
+/src/main/resources/data-local.sql

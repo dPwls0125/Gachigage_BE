@@ -198,4 +198,9 @@ src/main/java/com/team/project
     - constraints: `snake_case`
 - **민감 정보 관리 (Secret Key):**
     - `application.yml`에 DB 비밀번호나 AWS 키를 절대 올리면 안 됨
-    - 해결책: `.gitignore` 처리 후 로컬 공유
+    - .env 또는 .env.local에 Secret Key 작성
+    - `.gitignore` 처리 후 로컬 공유
+- **컨테이너 (Docker):**
+    - `docker-compose.yml`에서 MySQL, Redis 세팅
+    - DB_NAME, DB_PASSWORD, REDIS_PASSWORD, DB_PORT, REDIS_PORT 등을 .env 파일에 작성
+    - `docker-compose up -d` 명령어를 통해서 도커 실행
