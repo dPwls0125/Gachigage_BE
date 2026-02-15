@@ -3,6 +3,7 @@ package com.gachigage.trade.service;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.gachigage.chat.domain.ChatRoom;
 import com.gachigage.chat.repository.ChatRoomRepository;
@@ -40,6 +41,7 @@ public class TradeService {
 		return new ProductPricesInfoResponse(product.getStock(), prices);
 	}
 
+	@Transactional
 	public Trade requestTrade(TradeRequestDto tradeRequestDto) {
 		ChatRoom chatRoom = chatRoomRepository.findById(tradeRequestDto.getChatRoomId())
 			.orElseThrow(() -> new CustomException(ErrorCode.INVALID_INPUT_VALUE, "존재하지 않는 채팅방 정보입니다."));

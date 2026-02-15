@@ -2,10 +2,7 @@ package com.gachigage.trade.domain;
 
 import com.gachigage.chat.domain.ChatRoom;
 import com.gachigage.global.common.BaseEntity;
-import com.gachigage.member.Member;
 import com.gachigage.product.domain.Product;
-import com.gachigage.product.domain.ProductPrice;
-import com.gachigage.product.domain.TradeType;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -17,7 +14,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -37,7 +33,7 @@ public class Trade extends BaseEntity {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@Column(name = "chatroom_Id")
+	@JoinColumn(name = "chatroom_Id")
 	@ManyToOne
 	private ChatRoom chatRoom;
 

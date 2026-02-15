@@ -1,6 +1,5 @@
 package com.gachigage.trade.domain;
 
-import com.gachigage.product.domain.Product;
 import com.gachigage.product.domain.ProductPrice;
 
 import jakarta.persistence.Column;
@@ -31,12 +30,12 @@ public class TradeItem {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@Column(name = "trade_id")
+	@JoinColumn(name = "trade_id")
 	@ManyToOne(fetch = FetchType.LAZY)
 	private Trade trade;
 
-	@JoinColumn(name = "product_price_id")
 	@ManyToOne
+	@JoinColumn(name = "product_price_id")
 	private ProductPrice productPrice;
 
 	@Column(name = "unit_price")
