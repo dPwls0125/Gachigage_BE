@@ -11,7 +11,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -39,10 +38,6 @@ public class TradeItem {
 	@JoinColumn(name = "product_price_id")
 	@ManyToOne
 	private ProductPrice productPrice;
-
-	@JoinColumn(name = "product_id")
-	@ManyToOne
-	private Product product;
 
 	@Column(name = "unit_price")
 	private int priceSnapshot;

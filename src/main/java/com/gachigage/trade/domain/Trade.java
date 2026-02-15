@@ -1,5 +1,6 @@
 package com.gachigage.trade.domain;
 
+import com.gachigage.chat.domain.ChatRoom;
 import com.gachigage.global.common.BaseEntity;
 import com.gachigage.member.Member;
 import com.gachigage.product.domain.Product;
@@ -16,6 +17,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -35,25 +37,13 @@ public class Trade extends BaseEntity {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "seller_id", nullable = false)
-	private Member seller;
-
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "buyer_id", nullable = false)
-	private Member buyer;
+	@Column(name = "chatroom_Id")
+	@ManyToOne
+	private ChatRoom chatRoom;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "product_id", nullable = false)
 	private Product product;
-
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "product_price_id", nullable = false)
-	private ProductPrice productPrice;
-
-	@Enumerated(EnumType.STRING)
-	@Column(name = "trade_type", nullable = true)
-	private TradeType tradeType;
 
 	@Enumerated(EnumType.STRING)
 	@Column(name = "status", nullable = false)

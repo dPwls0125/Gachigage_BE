@@ -9,8 +9,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.gachigage.global.ApiResponse;
+import com.gachigage.trade.domain.Trade;
 import com.gachigage.trade.dto.ProductPricesInfoResponse;
 import com.gachigage.trade.dto.TradeRequestDto;
+import com.gachigage.trade.dto.TradeResponseDto;
 import com.gachigage.trade.service.TradeService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -32,10 +34,9 @@ public class TradeController {
 
 	@PostMapping("/request")
 	@Operation(description = "거래자가 거래 가격에 대한 set와 함께 거래 요청")
-	public ResponseEntity<ApiResponse<Void>> reqeustTrade(@RequestBody TradeRequestDto tradeRequest){
-		tradeService.requestTrade(tradeRequest);
-		return ResponseEntity.ok(ApiResponse.success());
+	public ResponseEntity<ApiResponse<TradeResponseDto>> reqeustTrade(@RequestBody TradeRequestDto tradeRequest) {
+		Trade trade = tradeService.requestTrade(tradeRequest);
+		return ResponseEntity.ok(ApiResponse.success(new TradeResponseDto(trade.getId())));
 	}
-
 
 }
