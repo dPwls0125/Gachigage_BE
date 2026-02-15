@@ -58,7 +58,6 @@ public class TradeService {
 			ProductPrice productPrice = productPriceRepository.findById(priceId)
 				.orElseThrow(() -> new CustomException(ErrorCode.INVALID_INPUT_VALUE, "존재하지 않는 가격 정보입니다."));
 
-
 			int setQuantity = set.getQuantity();
 			totalRequestedQuantity += productPrice.getQuantity() * setQuantity;
 
@@ -72,12 +71,27 @@ public class TradeService {
 				.quantitySnapshot(productPrice.getQuantity())
 				.totalPrice(unitPrice * setQuantity)
 				.build();
-
 			tradeItemRepository.save(tradeItem);
 		}
 
-		return reqeustedTrade;
+		reqeustedTrade.setTotalQuantity(totalRequestedQuantity);
 
+		return reqeustedTrade;
+	}
+
+	@Transactional
+	public void approveTrade(Long tradeId) {
+		Trade requestedTrade = tradeRepository.findById(tradeId)
+			.orElseThrow(() -> new CustomException(ErrorCode.INVALID_INPUT_VALUE, "존재하지 않는 거래입니다."));
+
+		Product product = requestedTrade.getProduct();
+
+		if (requestedTrade.getTotalQuantity() > product.getStock()) {
+			throw new CustomException(ErrorCode.INVALID_INPUT_VALUE, "거래를 요청한 수량 보다, 재고가 부족합니다.");
+		}
+
+		product.deduceStock(Long.valueOf(requestedTrade.getTotalQuantity()));
+		requestedTrade.setStatus(TradeStatus.DONE);
 	}
 
 	private void validateStockAndRequestedQuantity(Product tradeWantedProduct, int totalRequestedQuantity) {

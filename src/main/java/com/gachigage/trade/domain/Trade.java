@@ -1,5 +1,7 @@
 package com.gachigage.trade.domain;
 
+import java.util.List;
+
 import com.gachigage.chat.domain.ChatRoom;
 import com.gachigage.global.common.BaseEntity;
 import com.gachigage.product.domain.Product;
@@ -14,6 +16,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -44,4 +47,19 @@ public class Trade extends BaseEntity {
 	@Enumerated(EnumType.STRING)
 	@Column(name = "status", nullable = false)
 	private TradeStatus status;
+
+	@OneToMany(fetch = FetchType.LAZY)
+	private List<TradeItem> tradeItemList;
+
+	@Column(name = "total_quantity")
+	private Integer totalQuantity;
+
+	public void setTotalQuantity(Integer totalQuantity) {
+		this.totalQuantity = totalQuantity;
+	}
+
+	public void setStatus(TradeStatus status) {
+		this.status = status;
+	}
+
 }

@@ -39,4 +39,11 @@ public class TradeController {
 		return ResponseEntity.ok(ApiResponse.success(new TradeResponseDto(trade.getId())));
 	}
 
+	@PostMapping("/confirm/{tradeId}")
+	@Operation(description = "거래 완료 처리, 실제 stock 감소")
+	public ResponseEntity<ApiResponse<Void>> approveTrade(@PathVariable Long tradeId) {
+		tradeService.approveTrade(tradeId);
+		return ResponseEntity.ok(ApiResponse.success());
+	}
+
 }
