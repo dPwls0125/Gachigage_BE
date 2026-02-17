@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.gachigage.chat.domain.ChatRoom;
 import com.gachigage.global.common.BaseEntity;
+import com.gachigage.member.Member;
 import com.gachigage.product.domain.Product;
 
 import jakarta.persistence.Column;
@@ -48,11 +49,17 @@ public class Trade extends BaseEntity {
 	@Column(name = "status", nullable = false)
 	private TradeStatus status;
 
-	@OneToMany(fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "trade", fetch = FetchType.LAZY)
 	private List<TradeItem> tradeItemList;
 
 	@Column(name = "total_quantity")
 	private Integer totalQuantity;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	private Member buyer;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	private Member seller;
 
 	public void setTotalQuantity(Integer totalQuantity) {
 		this.totalQuantity = totalQuantity;
