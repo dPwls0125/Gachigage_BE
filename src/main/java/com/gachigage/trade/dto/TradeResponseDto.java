@@ -5,12 +5,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Setter
 @Getter
-@NoArgsConstructor
+@Setter
 @AllArgsConstructor
-public class TradeRequest {
-
-	Long productPriceId;
-
+@NoArgsConstructor
+public class TradeResponseDto {
+	private Long tradeId;
 }

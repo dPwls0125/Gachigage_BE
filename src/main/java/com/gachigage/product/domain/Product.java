@@ -97,7 +97,7 @@ public class Product extends BaseEntity {
 
 	@Enumerated(EnumType.STRING)
 	@Column(name = "status", nullable = false)
-	@ColumnDefault("'SELLING'") // DB에 들어갈 기본값
+	@ColumnDefault("'SELLING'")
 	private ProductStatus status;
 
 	private Product(Long id, Member seller, ProductCategory category, Region region,

@@ -1,10 +1,11 @@
 package com.gachigage.trade.domain;
 
+import java.util.List;
+
+import com.gachigage.chat.domain.ChatRoom;
 import com.gachigage.global.common.BaseEntity;
 import com.gachigage.member.Member;
 import com.gachigage.product.domain.Product;
-import com.gachigage.product.domain.ProductPrice;
-import com.gachigage.product.domain.TradeType;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -16,6 +17,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -35,27 +37,36 @@ public class Trade extends BaseEntity {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "seller_id", nullable = false)
-	private Member seller;
-
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "buyer_id", nullable = false)
-	private Member buyer;
+	@JoinColumn(name = "chatroom_Id")
+	@ManyToOne
+	private ChatRoom chatRoom;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "product_id", nullable = false)
 	private Product product;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "product_price_id", nullable = false)
-	private ProductPrice productPrice;
-
-	@Enumerated(EnumType.STRING)
-	@Column(name = "trade_type", nullable = true)
-	private TradeType tradeType;
-
 	@Enumerated(EnumType.STRING)
 	@Column(name = "status", nullable = false)
 	private TradeStatus status;
+
+	@OneToMany(mappedBy = "trade", fetch = FetchType.LAZY)
+	private List<TradeItem> tradeItemList;
+
+	@Column(name = "total_quantity")
+	private Integer totalQuantity;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	private Member buyer;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	private Member seller;
+
+	public void setTotalQuantity(Integer totalQuantity) {
+		this.totalQuantity = totalQuantity;
+	}
+
+	public void setStatus(TradeStatus status) {
+		this.status = status;
+	}
+
 }

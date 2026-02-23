@@ -59,13 +59,13 @@ public class MypageService {
 		member.updateNickname(newNickname);
 	}
 
-	public Page<TradeResponseDto> getPurchaseHistory(Long oauthId, Pageable pageable) {
-		Member member = memberRepository.findMemberByOauthId(oauthId)
-			.orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-
-		return tradeRepository.findAllByBuyerId(member.getId(), pageable)
-			.map(this::toTradeResponseDto);
-	}
+	// public Page<TradeResponseDto> getPurchaseHistory(Long oauthId, Pageable pageable) {
+	// 	Member member = memberRepository.findMemberByOauthId(oauthId)
+	// 		.orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+	//
+	// 	return tradeRepository.findAllByBuyerId(member.getId(), pageable)
+	// 		.map(this::toTradeResponseDto);
+	// }
 
 	public Page<ProductListResponseDto> getMySalesProducts(Long oauthId, Pageable pageable) {
 		Member member = memberRepository.findMemberByOauthId(oauthId)
@@ -76,28 +76,28 @@ public class MypageService {
 		return products.map(this::toProductListResponseDto);
 	}
 
-	private TradeResponseDto toTradeResponseDto(Trade trade) {
-		Product product = trade.getProduct();
-
-		int price = trade.getProductPrice().getPrice();
-		int quantity = trade.getProductPrice().getQuantity();
-
-		String thumbnailUrl = null;
-		if (product.getImages() != null && !product.getImages().isEmpty()) {
-			thumbnailUrl = product.getImages().get(0).getImageUrl();
-		}
-
-		return TradeResponseDto.builder()
-			.tradeId(trade.getId())
-			.productId(product.getId())
-			.title(product.getTitle())
-			.price(price)
-			.quantity(quantity)
-			.thumbnailUrl(thumbnailUrl)
-			.tradeDate(trade.getCreatedAt())
-			.status(String.valueOf(trade.getStatus()))
-			.build();
-	}
+	// private TradeResponseDto toTradeResponseDto(Trade trade) {
+	// 	Product product = trade.getProduct();
+	//
+	// 	int price = trade.getProductPrice().getPrice();
+	// 	int quantity = trade.getProductPrice().getQuantity();
+	//
+	// 	String thumbnailUrl = null;
+	// 	if (product.getImages() != null && !product.getImages().isEmpty()) {
+	// 		thumbnailUrl = product.getImages().get(0).getImageUrl();
+	// 	}
+	//
+	// 	return TradeResponseDto.builder()
+	// 		.tradeId(trade.getId())
+	// 		.productId(product.getId())
+	// 		.title(product.getTitle())
+	// 		.price(price)
+	// 		.quantity(quantity)
+	// 		.thumbnailUrl(thumbnailUrl)
+	// 		.tradeDate(trade.getCreatedAt())
+	// 		.status(String.valueOf(trade.getStatus()))
+	// 		.build();
+	// }
 
 	public Page<ProductListResponseDto> getMyLikes(Long oauthId, Pageable pageable) {
 		Member member = memberRepository.findMemberByOauthId(oauthId)
