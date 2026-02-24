@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 @Component
-@Profile("test")
+@Profile({"test", "local"})
 public class FakeImageUploader implements ImageUploader {
 
 	@Override
