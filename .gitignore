@@ -36,16 +36,9 @@ out/
 ### VS Code ###
 .vscode/
 
-### Spring Boot ###
-application.yml
-application.properties
-application-*.yml
-application-*.properties
-!application-template.yml
-
 ### env ###
 .env
-.env.local
+.env.*
 
 ### docker files ###
 /mysql
