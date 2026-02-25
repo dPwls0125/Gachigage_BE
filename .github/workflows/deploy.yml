@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: deploy-${{github.workflow}}-${{github.ref_name}}
+  group: ${{format('deploy-{0}-{1}', github.workflow, github.ref_name)}}
   cancel-in-progress: true
 
 permissions:
@@ -31,9 +31,6 @@ jobs:
         run: |
           chmod +x gradlew
           ./gradlew clean build -x test
-
-      - name: Set lowercase owner
-        run: echo "OWNER_LC=${GITHUB_REPOSITORY_OWNER,,}" >> $GITHUB_ENV
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -62,8 +59,8 @@ jobs:
           context: .
           push: true
           tags: |
-            ghcr.io/${{env.OWNER_LC}}/${{env.OWNER_LC}}-backend:${{steps.meta.outputs.tag}}
-            ghcr.io/${{env.OWNER_LC}}/${{env.OWNER_LC}}-backend:${{github.sha}}
+            ghcr.io/gachigage/gachigage-backend:${{steps.meta.outputs.tag}}
+            ghcr.io/gachigage/gachigage-backend:${{github.sha}}
 
       - name: Deploy on Server (pull and up)
         uses: appleboy/ssh-action@v1.0.3
@@ -75,13 +72,13 @@ jobs:
             set -e
             cd /opt/gachigage
 
-            IMAGE=ghcr.io/${{env.OWNER_LC}}/${{env.OWNER_LC}}-backend
+            IMAGE=ghcr.io/gachigage/gachigage-backend
             SHA_TAG=${{github.sha}}
             ROLLING_TAG=${{steps.meta.outputs.tag}}
 
             docker pull ${IMAGE}:${SHA_TAG}
             docker tag ${IMAGE}:${SHA_TAG} ${IMAGE}:${ROLLING_TAG}
 
-            unset COMPOSE_FILE
-            docker compose -f docker-compose.yml up -d --no-deps --force-recreate ${{steps.meta.outputs.service}}
+            export COMPOSE_FILE=/opt/gachigage/docker-compose.yml
+            docker compose --project-directory /opt/gachigage -f /opt/gachigage/docker-compose.yml up -d --no-deps --force-recreate ${{steps.meta.outputs.service}}
             docker image prune -af --filter "until=168h"
