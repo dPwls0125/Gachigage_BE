@@ -5,6 +5,10 @@ on:
     branches: [ "main", "develop" ]
   workflow_dispatch:
 
+concurrency:
+  group: deploy-${{ github.workflow }}-${{ github.ref_name }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
   packages: write
@@ -57,7 +61,9 @@ jobs:
         with:
           context: .
           push: true
-          tags: ghcr.io/${{env.OWNER_LC}}/${{env.OWNER_LC}}-backend:${{steps.meta.outputs.tag}}
+          tags: |
+            ghcr.io/${{env.OWNER_LC}}/${{env.OWNER_LC}}-backend:${{steps.meta.outputs.tag}}
+            ghcr.io/${{env.OWNER_LC}}/${{env.OWNER_LC}}-backend:${{github.sha}}
 
       - name: Deploy on Server (pull and up)
         uses: appleboy/ssh-action@v1.0.3
@@ -68,6 +74,13 @@ jobs:
           script: |
             set -e
             cd /opt/gachigage
-            docker compose pull ${{steps.meta.outputs.service}}
-            docker compose up -d --no-deps ${{steps.meta.outputs.service}}
+
+            IMAGE=ghcr.io/${{env.OWNER_LC}}/${{env.OWNER_LC}}-backend
+            SHA_TAG=${{github.sha}}
+            ROLLING_TAG=${{steps.meta.outputs.tag}}
+
+            docker pull ${IMAGE}:${SHA_TAG}
+            docker tag ${IMAGE}:${SHA_TAG} ${IMAGE}:${ROLLING_TAG}
+
+            docker compose up -d --no-deps --force-recreate ${{steps.meta.outputs.service}}
             docker image prune -af --filter "until=168h"
