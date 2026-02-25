@@ -1,27 +1,121 @@
 services:
-  # 1. MySQL (Main DB)
+  nginx:
+    image: nginx:latest
+    container_name: gachigage-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
+    depends_on:
+      - frontend
+      - backend-prod
+      - backend-dev
+    networks:
+      - app-network
+    command: '/bin/sh -c ''while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g "daemon off;"'''
+    restart: always
+
+  certbot:
+    image: certbot/certbot
+    container_name: gachigage-certbot
+    volumes:
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+
+  frontend:
+    image: ghcr.io/gachigage/gachigage-frontend:prod
+    container_name: gachigage-frontend
+    environment:
+      - NODE_ENV=production
+      - AUTH_SECRET=${SECRET_KEY}
+      - NEXTAUTH_URL=${DOMAIN}
+      - NEXT_PUBLIC_API_BASE_URL=${BACKEND_URL}
+      - NAVER_CLIENT_ID=${NAVER_CLIENT_ID}
+      - NAVER_CLIENT_SECRET=${NAVER_CLIENT_SECRET}
+    networks:
+      - app-network
+    restart: always
+
+  backend-prod:
+    image: ghcr.io/gachigage/gachigage-backend:prod
+    env_file:
+      - ./.env
+    container_name: gachigage-backend-prod
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/${DB_NAME_PROD}?characterEncoding=UTF-8&serverTimezone=Asia/Seoul
+      - SPRING_DATASOURCE_USERNAME=${DB_USERNAME}
+      - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
+      - SPRING_REDIS_HOST=redis
+      - SPRING_REDIS_PORT=6379
+      - SPRING_REDIS_PASSWORD=${REDIS_PASSWORD}
+    depends_on:
+      - mysql
+      - redis
+    networks:
+      - app-network
+    restart: always
+
+  backend-dev:
+    image: ghcr.io/gachigage/gachigage-backend:dev
+    env_file:
+      - ./.env.dev
+    container_name: gachigage-backend-dev
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/${DB_NAME_DEV}?characterEncoding=UTF-8&serverTimezone=Asia/Seoul
+      - SPRING_DATASOURCE_USERNAME=${DB_USERNAME}
+      - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
+      - SPRING_REDIS_HOST=redis
+      - SPRING_REDIS_PORT=6379
+      - SPRING_REDIS_PASSWORD=${REDIS_PASSWORD}
+    depends_on:
+      - mysql
+      - redis
+    networks:
+      - app-network
+    restart: always
+
   mysql:
     image: mysql:8.0
     container_name: gachigage-db
     environment:
-      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
-      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
       TZ: Asia/Seoul
+      LC_ALL: C.UTF-8
+      LANG: C.UTF-8
     command:
       - --character-set-server=utf8mb4
-      - --log_bin_trust_function_creators=1
       - --collation-server=utf8mb4_unicode_ci
-    ports:
-      - "${DB_PORT}:3306"
+      - --skip-character-set-client-handshake
     volumes:
-      - ./mysql:/var/lib/mysql
+      - mysql_data:/var/lib/mysql
+      - mysql_init:/docker-entrypoint-initdb.d
+    networks:
+      - app-network
     restart: always
 
-  # 2. Redis (Cache)
   redis:
     image: redis:alpine
     container_name: gachigage-redis
     command: redis-server --requirepass ${REDIS_PASSWORD}
-    ports:
-      - "${REDIS_PORT}:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - app-network
     restart: always
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  mysql_data:
+  mysql_init:
+  redis_data:

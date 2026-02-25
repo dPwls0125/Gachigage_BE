@@ -62,17 +62,17 @@ public class MypageController {
 		return ResponseEntity.ok(ApiResponse.success(response));
 	}
 
-	@GetMapping("/purchases")
-	public ResponseEntity<ApiResponse<Page<TradeResponseDto>>> getPurchaseHistory(
-		@AuthenticationPrincipal UserDetails user,
-		@PageableDefault(size = 12, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
-
-		Long oauthId = Long.valueOf(user.getUsername());
-
-		Page<TradeResponseDto> response = mypageService.getPurchaseHistory(oauthId, pageable);
-
-		return ResponseEntity.ok(ApiResponse.success(response));
-	}
+	// @GetMapping("/purchases")
+	// public ResponseEntity<ApiResponse<Page<TradeResponseDto>>> getPurchaseHistory(
+	// 	@AuthenticationPrincipal UserDetails user,
+	// 	@PageableDefault(size = 12, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+	//
+	// 	Long oauthId = Long.valueOf(user.getUsername());
+	//
+	// 	Page<TradeResponseDto> response = mypageService.getPurchaseHistory(oauthId, pageable);
+	//
+	// 	return ResponseEntity.ok(ApiResponse.success(response));
+	// }
 
 	@GetMapping("/sales")
 	public ResponseEntity<ApiResponse<Page<ProductListResponseDto>>> getMyProducts(
