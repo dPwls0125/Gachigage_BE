@@ -43,7 +43,7 @@ services:
   backend-prod:
     image: ghcr.io/gachigage/gachigage-backend:prod
     env_file:
-      -./.env
+      - ./.env
     container_name: gachigage-backend-prod
     environment:
       - SPRING_PROFILES_ACTIVE=prod
